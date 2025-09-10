@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>خطة مشروع نظام إدارة المطاعم</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals with Muted Blue Accent -->
+    <!-- Application Structure Plan: تم تصميم التطبيق كصفحة واحدة مقسمة إلى أقسام مواضيعية يمكن التنقل بينها بسلاسة عبر شريط التنقل العلوي. يبدأ التطبيق بنظرة عامة، ثم ينتقل إلى قسم تفاعلي رئيسي يسمح للمستخدم بالتبديل بين أدوار المستخدمين (Super Admin, Admin, Customer) لعرض مسؤوليات كل منهم. يلي ذلك قسم يوضح هيكل النظام ومكوناته باستخدام مخطط بصري مبني بـ HTML/CSS. ثم، يتم عرض التقنيات المقترحة. الجزء الأكثر تفاعلية هو محاكاة لوحة تحكم الـ "Super Admin" التي تحتوي على رسم بياني ديناميكي ومؤشرات أداء رئيسية، مما يعطي تصوراً حياً للمنتج النهائي. تم اختيار هذا الهيكل لتقديم الخطة بشكل تدريجي ومنطقي، بدءًا من الفكرة العامة ووصولاً إلى التفاصيل الدقيقة والتصورات التفاعلية، مما يسهل استيعاب المشروع بالكامل. -->
+    <!-- Visualization & Content Choices: 1. أدوار المستخدمين: (الهدف: مقارنة وتوضيح) -> استخدام أزرار تبويب (Tabs) لتحديث المحتوى ديناميكياً باستخدام JavaScript لعرض تفاصيل كل دور. هذا التفاعل يسمح بمقارنة سهلة بين الأدوار المختلفة. 2. هيكل النظام: (الهدف: تنظيم وعرض العلاقات) -> تم بناء مخطط تدفق باستخدام Flexbox و Tailwind CSS بدلاً من الصور أو SVG، لعرض العلاقة بين الواجهة الأمامية، الخلفية، وقاعدة البيانات. 3. لوحة التحكم (محاكاة): (الهدف: عرض البيانات بشكل تفاعلي) -> استخدام رسم بياني شريطي من Chart.js لعرض بيانات افتراضية (الإيرادات والاشتراكات). يتفاعل الرسم البياني مع قائمة منسدلة لتغيير البيانات المعروضة، مما يوضح إمكانيات تحليل البيانات في النظام. تم وضع الرسم البياني داخل حاوية متجاوبة ومحددة الأبعاد لتجنب مشاكل التخطيط. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Cairo', sans-serif; scroll-behavior: smooth; }
+        .chart-container { position: relative; width: 100%; max-width: 800px; margin-left: auto; margin-right: auto; height: 350px; max-height: 400px; }
+        @media (min-width: 768px) { .chart-container { height: 400px; } }
+        .tab-active { background-color: #2563eb; color: white; }
+        .tab-inactive { background-color: #e5e7eb; color: #374151; }
+        .content-active { display: block; }
+        .content-inactive { display: none; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <header class="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-blue-600">نظام المطاعم</h1>
+            <div class="hidden md:flex space-x-8 space-x-reverse">
+                <a href="#overview" class="text-slate-600 hover:text-blue-600 transition">الفكرة الأساسية</a>
+                <a href="#roles" class="text-slate-600 hover:text-blue-600 transition">أدوار المستخدمين</a>
+                <a href="#architecture" class="text-slate-600 hover:text-blue-600 transition">مكونات النظام</a>
+                <a href="#dashboard" class="text-slate-600 hover:text-blue-600 transition">لوحة التحكم</a>
+                <a href="#tech" class="text-slate-600 hover:text-blue-600 transition">التقنيات</a>
+            </div>
+            <button id="mobile-menu-button" class="md:hidden p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden px-6 pt-2 pb-4">
+            <a href="#overview" class="block py-2 text-slate-600 hover:text-blue-600">الفكرة الأساسية</a>
+            <a href="#roles" class="block py-2 text-slate-600 hover:text-blue-600">أدوار المستخدمين</a>
+            <a href="#architecture" class="block py-2 text-slate-600 hover:text-blue-600">مكونات النظام</a>
+            <a href="#dashboard" class="block py-2 text-slate-600 hover:text-blue-600">لوحة التحكم</a>
+            <a href="#tech" class="block py-2 text-slate-600 hover:text-blue-600">التقنيات</a>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-12">
+
+        <section id="overview" class="text-center min-h-[60vh] flex flex-col justify-center items-center">
+            <h2 class="text-4xl md:text-5xl font-bold text-slate-900 mb-4">منصة متكاملة لإدارة مطعمك بذكاء</h2>
+            <p class="max-w-3xl text-lg text-slate-600 mb-8">
+                يهدف هذا المشروع إلى بناء منصة تربط بين مدير النظام، أصحاب المطاعم، والزبائن، لتسهيل عمليات الطلب والإدارة وتقديم تجربة مستخدم سلسة ومتكاملة.
+            </p>
+            <a href="#roles" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-700 transition shadow-lg">اكتشف المزيد</a>
+        </section>
+
+        <section id="roles" class="py-16">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-slate-900">أدوار المستخدمين في النظام</h2>
+                <p class="text-slate-600 mt-2">لكل مستخدم واجهة وصلاحيات مصممة خصيصًا لتلبية احتياجاته. اضغط على الدور لعرض تفاصيله.</p>
+            </div>
+            <div class="flex justify-center mb-8 gap-2 md:gap-4">
+                <button data-tab="super-admin" class="role-tab tab-active text-sm md:text-base font-semibold py-3 px-6 rounded-lg transition">مدير النظام</button>
+                <button data-tab="admin" class="role-tab tab-inactive text-sm md:text-base font-semibold py-3 px-6 rounded-lg transition">صاحب المطعم</button>
+                <button data-tab="customer" class="role-tab tab-inactive text-sm md:text-base font-semibold py-3 px-6 rounded-lg transition">الزبون</button>
+            </div>
+
+            <div class="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-lg border border-slate-200">
+                <div id="super-admin-content" class="role-content content-active">
+                    <h3 class="text-2xl font-bold mb-4 text-blue-700">لوحة تحكم مدير النظام (Super Admin)</h3>
+                    <p class="text-slate-600 mb-6">هي المركز الرئيسي لمراقبة وإدارة المنصة بالكامل، مما يمنحك رؤية شاملة لكل العمليات.</p>
+                    <ul class="space-y-4 text-slate-700">
+                        <li class="flex items-start"><span class="bg-blue-100 text-blue-600 font-bold rounded-full w-6 h-6 flex items-center justify-center ml-3 shrink-0">✓</span><span><b>لوحة تحكم كاملة:</b> لإدارة جميع المطاعم المشتركة.</span></li>
+                        <li class="flex items-start"><span class="bg-blue-100 text-blue-600 font-bold rounded-full w-6 h-6 flex items-center justify-center ml-3 shrink-0">✓</span><span><b>مراقبة الأداء:</b> تتبع الاشتراكات، عدد الطلبات، الأرباح، والعملاء.</span></li>
+                        <li class="flex items-start"><span class="bg-blue-100 text-blue-600 font-bold rounded-full w-6 h-6 flex items-center justify-center ml-3 shrink-0">✓</span><span><b>إدارة الاشتراكات:</b> التحكم في أسعار الخطط الشهرية والسنوية.</span></li>
+                        <li class="flex items-start"><span class="bg-blue-100 text-blue-600 font-bold rounded-full w-6 h-6 flex items-center justify-center ml-3 shrink-0">✓</span><span><b>إدارة الدفع:</b> مراقبة عمليات الدفع عبر الإنترنت (Visa, Vodafone Cash, Fawry).</span></li>
+                    </ul>
+                </div>
+                <div id="admin-content" class="role-content content-inactive">
+                    <h3 class="text-2xl font-bold mb-4 text-emerald-700">لوحة تحكم صاحب المطعم (Admin)</h3>
+                    <p class="text-slate-600 mb-6">أدوات متكاملة لإدارة مطعمك بكفاءة، من تحديث القائمة إلى متابعة المبيعات.</p>
+                    <ul class="space-y-4 text-slate-700">
+                        <li class="flex items-start"><span class="bg-emerald-100 text-emerald-600 font-bold rounded-full w-6 h-6 flex items-center justify-center ml-3 shrink-0">✓</span><span><b>إدارة المنيو:</b> إضافة، تعديل، وحذف الأصناف مع الصور والأسعار.</span></li>
+                        <li class="flex items-start"><span class="bg-emerald-100 text-emerald-600 font-bold rounded-full w-6 h-6 flex items-center justify-center ml-3 shrink-0">✓</span><span><b>توفر المنتجات:</b> تحديد حالة المنتج (متوفر/غير متوفر) بسهولة.</span></li>
+                        <li class="flex items-start"><span class="bg-emerald-100 text-emerald-600 font-bold rounded-full w-6 h-6 flex items-center justify-center ml-3 shrink-0">✓</span><span><b>تقارير المبيعات:</b> الاطلاع على تقارير تفصيلية للمبيعات وطلبات الزبائن.</span></li>
+                        <li class="flex items-start"><span class="bg-emerald-100 text-emerald-600 font-bold rounded-full w-6 h-6 flex items-center justify-center ml-3 shrink-0">✓</span><span><b>طباعة الفواتير:</b> إمكانية طباعة الفواتير مباشرة من لوحة التحكم.</span></li>
+                    </ul>
+                </div>
+                <div id="customer-content" class="role-content content-inactive">
+                    <h3 class="text-2xl font-bold mb-4 text-amber-700">واجهة الزبون (Customer)</h3>
+                    <p class="text-slate-600 mb-6">تجربة طلب طعام سهلة وسريعة، مع متابعة حية لحالة الطلب من البداية حتى الاستلام.</p>
+                    <ul class="space-y-4 text-slate-700">
+                        <li class="flex items-start"><span class="bg-amber-100 text-amber-600 font-bold rounded-full w-6 h-6 flex items-center justify-center ml-3 shrink-0">✓</span><span><b>تصفح وطلب:</b> يختار المطعم، يتصفح المنيو، ويقوم بتقديم الطلب ببساطة.</span></li>
+                        <li class="flex items-start"><span class="bg-amber-100 text-amber-600 font-bold rounded-full w-6 h-6 flex items-center justify-center ml-3 shrink-0">✓</span><span><b>خيارات دفع مرنة:</b> إمكانية الدفع أونلاين أو عند الاستلام.</span></li>
+                        <li class="flex items-start"><span class="bg-amber-100 text-amber-600 font-bold rounded-full w-6 h-6 flex items-center justify-center ml-3 shrink-0">✓</span><span><b>متابعة الطلب:</b> تتبع حالة الطلب في الوقت الفعلي (قيد التنفيذ، في الطريق، مستلم).</span></li>
+                        <li class="flex items-start"><span class="bg-amber-100 text-amber-600 font-bold rounded-full w-6 h-6 flex items-center justify-center ml-3 shrink-0">✓</span><span><b>واجهة مستخدم بسيطة:</b> يمكنه الدخول عبر الويب أو تطبيق الموبايل (مستقبلاً).</span></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="architecture" class="py-16 bg-white rounded-xl shadow-lg border border-slate-200">
+             <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-slate-900">مكونات وهيكلية النظام</h2>
+                <p class="text-slate-600 mt-2 max-w-2xl mx-auto">يوضح هذا المخطط كيفية تفاعل المكونات المختلفة للنظام مع بعضها البعض، بدءًا من واجهة المستخدم ووصولًا إلى قاعدة البيانات.</p>
+            </div>
+            <div class="flex flex-col md:flex-row items-center justify-center gap-8 text-center p-4">
+                <div class="flex flex-col items-center gap-4">
+                    <div class="p-6 bg-amber-100 rounded-lg shadow">
+                        <span class="text-4xl">📱</span>
+                        <h3 class="font-bold mt-2">واجهة الزبون</h3>
+                        <p class="text-sm text-slate-600">(React / Next.js)</p>
+                    </div>
+                     <div class="p-6 bg-emerald-100 rounded-lg shadow mt-4">
+                        <span class="text-4xl">🖥️</span>
+                        <h3 class="font-bold mt-2">لوحة تحكم المطعم</h3>
+                         <p class="text-sm text-slate-600">(React / Next.js)</p>
+                    </div>
+                </div>
+                
+                <div class="text-4xl text-slate-400 font-mono hidden md:block">→</div>
+                <div class="text-4xl text-slate-400 font-mono rotate-90 md:hidden">→</div>
+
+                <div class="p-6 bg-slate-100 rounded-lg shadow">
+                    <span class="text-4xl">⚙️</span>
+                    <h3 class="font-bold mt-2">الخادم والتطبيقات</h3>
+                    <p class="text-sm text-slate-600">(Node.js / Laravel)</p>
+                </div>
+
+                <div class="text-4xl text-slate-400 font-mono hidden md:block">→</div>
+                <div class="text-4xl text-slate-400 font-mono rotate-90 md:hidden">→</div>
+
+                <div class="p-6 bg-blue-100 rounded-lg shadow">
+                    <span class="text-4xl">🗃️</span>
+                    <h3 class="font-bold mt-2">قاعدة البيانات</h3>
+                    <p class="text-sm text-slate-600">(MySQL / PostgreSQL)</p>
+                </div>
+                 <div class="text-4xl text-slate-400 font-mono hidden md:block">→</div>
+                 <div class="text-4xl text-slate-400 font-mono rotate-90 md:hidden">→</div>
+
+                 <div class="p-6 bg-purple-100 rounded-lg shadow">
+                    <span class="text-4xl">💳</span>
+                    <h3 class="font-bold mt-2">بوابات الدفع</h3>
+                    <p class="text-sm text-slate-600">(Paymob / Stripe)</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="dashboard" class="py-16">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-slate-900">محاكاة لوحة تحكم مدير النظام</h2>
+                <p class="text-slate-600 mt-2 max-w-2xl mx-auto">هذا عرض تفاعلي لما ستبدو عليه لوحة التحكم الرئيسية، مع بيانات حية توضح أداء المنصة. جرّب تغيير عرض البيانات من القائمة أدناه.</p>
+            </div>
+            
+            <div class="bg-white p-6 md:p-8 rounded-xl shadow-lg border border-slate-200">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-slate-100 p-5 rounded-lg">
+                        <h4 class="text-slate-500 font-semibold">إجمالي الإيرادات</h4>
+                        <p class="text-3xl font-bold text-slate-800 mt-1">125,430 ج.م</p>
+                    </div>
+                    <div class="bg-slate-100 p-5 rounded-lg">
+                        <h4 class="text-slate-500 font-semibold">المطاعم المشتركة</h4>
+                        <p class="text-3xl font-bold text-slate-800 mt-1">78</p>
+                    </div>
+                    <div class="bg-slate-100 p-5 rounded-lg">
+                        <h4 class="text-slate-500 font-semibold">إجمالي الطلبات</h4>
+                        <p class="text-3xl font-bold text-slate-800 mt-1">8,921</p>
+                    </div>
+                    <div class="bg-slate-100 p-5 rounded-lg">
+                        <h4 class="text-slate-500 font-semibold">متوسط قيمة الطلب</h4>
+                        <p class="text-3xl font-bold text-slate-800 mt-1">140.5 ج.م</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center mb-4">
+                     <h3 class="text-xl font-bold">نظرة عامة على الأداء</h3>
+                    <select id="chart-filter" class="border border-slate-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="revenue">الإيرادات الشهرية</option>
+                        <option value="subscriptions">الاشتراكات الجديدة</option>
+                    </select>
+                </div>
+                <div class="chart-container">
+                    <canvas id="dashboard-chart"></canvas>
+                </div>
+            </div>
+        </section>
+        
+        <section id="tech" class="py-16">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-slate-900">التقنيات المقترحة</h2>
+                <p class="text-slate-600 mt-2">مجموعة من التقنيات الحديثة والموثوقة لضمان أداء عالٍ وتجربة مستخدم ممتازة.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                <div class="bg-white p-6 rounded-lg shadow border border-slate-200">
+                    <h3 class="font-bold text-lg text-blue-600 mb-2">Frontend</h3>
+                    <p>React.js أو Next.js (لتطوير واجهة سريعة ومتجاوبة)</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow border border-slate-200">
+                    <h3 class="font-bold text-lg text-blue-600 mb-2">Backend</h3>
+                    <p>Node.js أو PHP (Laravel) (لبناء خادم قوي وآمن)</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow border border-slate-200">
+                    <h3 class="font-bold text-lg text-blue-600 mb-2">Database</h3>
+                    <p>MySQL أو PostgreSQL (لتخزين البيانات بكفاءة)</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow border border-slate-200">
+                    <h3 class="font-bold text-lg text-blue-600 mb-2">Payments</h3>
+                    <p>Paymob أو Stripe (لمعالجة المدفوعات ودعم فودافون كاش)</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow border border-slate-200">
+                    <h3 class="font-bold text-lg text-blue-600 mb-2">Hosting</h3>
+                    <p>AWS أو DigitalOcean (لاستضافة موثوقة وقابلة للتطوير)</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    
+    <footer class="bg-slate-800 text-white text-center py-6">
+        <p>&copy; 2025 نظام إدارة المطاعم. جميع الحقوق محفوظة.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            const roleTabs = document.querySelectorAll('.role-tab');
+            const roleContents = document.querySelectorAll('.role-content');
+
+            roleTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const target = tab.dataset.tab;
+
+                    roleTabs.forEach(t => {
+                        t.classList.remove('tab-active');
+                        t.classList.add('tab-inactive');
+                    });
+                    tab.classList.remove('tab-inactive');
+                    tab.classList.add('tab-active');
+
+                    roleContents.forEach(content => {
+                        if (content.id === `${target}-content`) {
+                            content.classList.remove('content-inactive');
+                            content.classList.add('content-active');
+                        } else {
+                            content.classList.remove('content-active');
+                            content.classList.add('content-inactive');
+                        }
+                    });
+                });
+            });
+
+            const chartData = {
+                labels: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو'],
+                revenue: {
+                    label: 'الإيرادات (ج.م)',
+                    data: [15000, 18000, 22000, 20500, 25000, 28000],
+                    backgroundColor: 'rgba(59, 130, 246, 0.5)',
+                    borderColor: 'rgba(59, 130, 246, 1)',
+                },
+                subscriptions: {
+                    label: 'الاشتراكات الجديدة',
+                    data: [8, 12, 10, 15, 13, 18],
+                    backgroundColor: 'rgba(16, 185, 129, 0.5)',
+                    borderColor: 'rgba(16, 185, 129, 1)',
+                }
+            };
+            
+            const ctx = document.getElementById('dashboard-chart').getContext('2d');
+            const dashboardChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: chartData.labels,
+                    datasets: [chartData.revenue]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                     return new Intl.NumberFormat('ar-EG').format(value);
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true
+                        },
+                        tooltip: {
+                             callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += new Intl.NumberFormat('ar-EG').format(context.parsed.y);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            const chartFilter = document.getElementById('chart-filter');
+            chartFilter.addEventListener('change', (event) => {
+                const filterValue = event.target.value;
+                dashboardChart.data.datasets[0] = chartData[filterValue];
+                dashboardChart.update();
+            });
+        });
+    </script>
+</body>
+</html>
